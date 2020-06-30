@@ -1,0 +1,20 @@
+{
+  "name": "Keyboard Navigation",
+  "version": "1.0.0",
+  "description": "Keyboard control for mouse actions in webpages",
+  "manifest_version": 2,
+  "permissions": ["activeTab"],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "commands": {
+    "start-session": {
+      "suggested_key": {
+        "default": "Ctrl+Y",
+        "mac": "Ctrl+Y"
+      },
+      "description": "Start extension session"
+    }
+  }
+}
