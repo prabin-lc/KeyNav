@@ -2,29 +2,17 @@ const SCROLL_DOWN = "j";
 const SCROLL_UP = "k";
 const HOVER = "a";
 const CLICK = "c";
-const NAV_BUTTONS = ["h", "g", "f"];
-
-function keyPressListener(e) {
-  keyBuffer.push(e.key);
-}
-
-function start() {
-  document.body.addEventListener("keypress", keyPressListener);
-  console.log("session started");
-}
-
-function exit() {
-  document.body.removeEventListener("keypress", keyPressListener);
-  chrome.runtime.sendMessage({ status: "exit" });
-  console.log("session ended");
-}
+const NAV_KEYS = ["h", "g", "f"];
 
 function Node(
   /**
    * the job to perform when user hits this node
-   * must contain a cleanup for root nodes */
+   */
 
   job,
+  /**
+   * an array with fixed indexes and keys mapping
+   */
   children
 ) {
   this.job = job;
@@ -32,11 +20,16 @@ function Node(
 }
 
 Node.prototype.constructor = Node;
-Node.prototype.getChild = function (input) {
-  // todo
+Node.prototype.gotoChild = function (input) {
+  /**
+   * goes to a child wrt to the input and also performs the job
+   * if no child was found for the input then cleanup and exit
+   */
 };
 Node.prototype.getLeaves = function () {
-  // todo
+  /**
+   * get leaf nodes (except the main nodes because of recurssion) with their paths
+   */
 };
 
 const SCROLL_DOWN_NODE = new Node(function () {
@@ -66,3 +59,31 @@ CLICK_NODE.children = MAIN_NODES;
 
 const ROOT_NODE = new Node(undefined, MAIN_NODES);
 let currentNode = ROOT_NODE;
+
+function generateGraph(elements, isHover = true) {
+  /**
+   * generate linked graph for the captured html elements
+   * jobs must click or hover the element according to the parameter provided
+   */
+}
+
+function keyPressListener(e) {
+  /**handles key press
+   * mainly calls gotoChild of current node
+   */
+  keyBuffer.push(e.key);
+}
+
+function start() {
+  document.body.addEventListener("keypress", keyPressListener);
+  console.log("session started");
+}
+
+function exit() {
+  /**
+   * cleanup all events, remove event listeners, reset render
+   */
+  document.body.removeEventListener("keypress", keyPressListener);
+  chrome.runtime.sendMessage({ status: "exit" });
+  console.log("session ended");
+}
