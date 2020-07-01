@@ -1,4 +1,5 @@
-let appState = "not started";
+let appState = "not started"; // extend for multiple tabs
+
 chrome.commands.onCommand.addListener(function (command) {
   if (command === "start-session" && appState !== "running") {
     if (appState === "not started") {

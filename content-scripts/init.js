@@ -1,8 +1,4 @@
-const SCROLL_DOWN = "j";
-const SCROLL_UP = "k";
-const HOVER = "a";
-const CLICK = "c";
-const NAV_KEYS = ["h", "g", "f"];
+const KEYS = ["j", "k", "a", "c", "h", "g", "f"];
 
 function Node(
   /**
@@ -13,7 +9,7 @@ function Node(
   /**
    * an array with fixed indexes and keys mapping
    */
-  children
+  children = []
 ) {
   this.job = job;
   this.children = children;
@@ -25,6 +21,10 @@ Node.prototype.gotoChild = function (input) {
    * goes to a child wrt to the input and also performs the job
    * if no child was found for the input then cleanup and exit
    */
+  currentNode = this.children[KEYS.indexOf(input)];
+  if (currentNode) {
+    if (currentNode.job) currentNode.job();
+  } else exit();
 };
 Node.prototype.getLeaves = function () {
   /**
@@ -34,10 +34,12 @@ Node.prototype.getLeaves = function () {
 
 const SCROLL_DOWN_NODE = new Node(function () {
   // scroll down
+  window.scrollBy(0, 200);
 });
 
 const SCROLL_UP_NODE = new Node(function () {
   // scroll up
+  window.scrollBy(0, -200);
 });
 
 const HOVER_NODE = new Node(function () {
@@ -50,7 +52,7 @@ const CLICK_NODE = new Node(function () {
   // change display to override elements
 });
 
-const MAIN_NODES = [SCROLL_DOWN_NODE, SCROLL_UP_NODE, HOVER_NODE, CLICK_NODE];
+const MAIN_NODES = [SCROLL_DOWN_NODE, SCROLL_UP_NODE, HOVER_NODE, CLICK_NODE, new Node()];
 
 SCROLL_DOWN_NODE.children = MAIN_NODES;
 SCROLL_UP_NODE.children = MAIN_NODES;
@@ -71,11 +73,13 @@ function keyPressListener(e) {
   /**handles key press
    * mainly calls gotoChild of current node
    */
-  keyBuffer.push(e.key);
+  console.log(e);
+  currentNode.gotoChild(e.key);
 }
 
 function start() {
   document.body.addEventListener("keypress", keyPressListener);
+  document.getElementsByTagName("html")[0].style["scrollBehavior"] = "smooth";
   console.log("session started");
 }
 
@@ -84,6 +88,7 @@ function exit() {
    * cleanup all events, remove event listeners, reset render
    */
   document.body.removeEventListener("keypress", keyPressListener);
+  currentNode = ROOT_NODE;
   chrome.runtime.sendMessage({ status: "exit" });
   console.log("session ended");
 }
