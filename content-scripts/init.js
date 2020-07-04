@@ -1,3 +1,5 @@
+let appStatus = "idle";
+
 const KEYS = ["j", "k", "a", "c", "h", "g", "f"];
 
 function Node(
@@ -9,7 +11,7 @@ function Node(
   /**
    * an array with fixed indexes and keys mapping
    */
-  children = []
+  children
 ) {
   this.job = job;
   this.children = children;
@@ -74,21 +76,27 @@ function keyPressListener(e) {
    * mainly calls gotoChild of current node
    */
   console.log(e);
-  currentNode.gotoChild(e.key);
+  try {
+    currentNode.gotoChild(e.key);
+  } catch (error) {
+    exit(error);
+  }
 }
 
 function start() {
-  document.body.addEventListener("keypress", keyPressListener);
-  document.getElementsByTagName("html")[0].style["scrollBehavior"] = "smooth";
   console.log("session started");
+  document.getElementsByTagName("html")[0].style["scrollBehavior"] = "smooth";
+  document.body.addEventListener("keypress", keyPressListener);
+  appStatus = "running";
 }
 
-function exit() {
+function exit(error) {
   /**
    * cleanup all events, remove event listeners, reset render
    */
+  if (error) console.error(error);
   document.body.removeEventListener("keypress", keyPressListener);
   currentNode = ROOT_NODE;
-  chrome.runtime.sendMessage({ status: "exit" });
+  appStatus = "idle";
   console.log("session ended");
 }
