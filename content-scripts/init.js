@@ -1,17 +1,17 @@
 let appStatus = "idle";
 
-const KEYS = ["j", "k", "a", "c", "h", "g", "f"];
-
+const KEYS = ["j", "k", "a", "f", "h", "g", "c"];
+let allValidDomElements = null;
 function Node(
   /**
    * the job to perform when user hits this node
    */
 
-  job,
+  job = undefined,
   /**
-   * an array with fixed indexes and keys mapping
+   * an array of child nodes with fixed indexes and keys mapping
    */
-  children
+  children = undefined
 ) {
   this.job = job;
   this.children = children;
@@ -52,9 +52,13 @@ const HOVER_NODE = new Node(function () {
 const CLICK_NODE = new Node(function () {
   // generate child nodes
   // change display to override elements
+  getAllValidElements();
+  let elements = getElementsWithInDisplay();
+  this.children = generateGraph(elements).children;
+  console.log(this);
 });
 
-const MAIN_NODES = [SCROLL_DOWN_NODE, SCROLL_UP_NODE, HOVER_NODE, CLICK_NODE, new Node()];
+const MAIN_NODES = [SCROLL_DOWN_NODE, SCROLL_UP_NODE, HOVER_NODE, CLICK_NODE]; // todo: add horizontal scroll nodes
 
 SCROLL_DOWN_NODE.children = MAIN_NODES;
 SCROLL_UP_NODE.children = MAIN_NODES;
@@ -64,11 +68,56 @@ CLICK_NODE.children = MAIN_NODES;
 const ROOT_NODE = new Node(undefined, MAIN_NODES);
 let currentNode = ROOT_NODE;
 
-function generateGraph(elements, isHover = true) {
+function isVisible(el) {
+  const rect = el.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+}
+function getAllValidElements(validTags = ["button", "a"]) {
+  if (!allValidDomElements) allValidDomElements = Array.from(document.querySelectorAll(validTags.join()));
+}
+function getElementsWithInDisplay() {
+  /**
+   * gets the elements of dom within screen view
+   * elements to be captured can be provided by the user
+   * linear filtering is applied which need to be changed with recursive later
+   */
+  console.log(allValidDomElements);
+  return allValidDomElements.filter((el) => isVisible(el));
+}
+function generateGraph(elements, isHover = false) {
   /**
    * generate linked graph for the captured html elements
    * jobs must click or hover the element according to the parameter provided
+   * return a node
    */
+  const navKeys = KEYS.slice(MAIN_NODES.length);
+  const elementNodes = elements.map(
+    (el) =>
+      new Node(function () {
+        exit();
+        el.click();
+      })
+  );
+  function createParentNodes(nodes, childrenNumber) {
+    if (nodes.length <= 1) return nodes;
+    const parentNodes = [];
+    while (nodes.length > 0) {
+      let parentNode = new Node(undefined, [...MAIN_NODES]);
+      for (let i = 0; i < childrenNumber; i++) {
+        let child = nodes.pop();
+        if (child === undefined) break;
+        parentNode.children.push(child);
+      }
+      parentNodes.push(parentNode);
+    }
+    return createParentNodes(parentNodes, childrenNumber);
+  }
+  return createParentNodes(elementNodes, navKeys.length)[0];
 }
 
 function keyPressListener(e) {
@@ -85,18 +134,21 @@ function keyPressListener(e) {
 
 function start() {
   console.log("session started");
+  console.log(allValidDomElements);
   document.getElementsByTagName("html")[0].style["scrollBehavior"] = "smooth";
   document.body.addEventListener("keypress", keyPressListener);
   appStatus = "running";
 }
 
-function exit(error) {
+function exit(error = null) {
   /**
    * cleanup all events, remove event listeners, reset render
    */
   if (error) console.error(error);
-  document.body.removeEventListener("keypress", keyPressListener);
   currentNode = ROOT_NODE;
   appStatus = "idle";
+  document.body.removeEventListener("keypress", keyPressListener);
   console.log("session ended");
 }
+
+// export default generateGraph;
