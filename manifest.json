@@ -16,5 +16,6 @@
       },
       "description": "Start extension session"
     }
-  }
+  },
+  "web_accessible_resources": ["/content-scripts/overlayCss.css"]
 }

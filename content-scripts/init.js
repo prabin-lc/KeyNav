@@ -16,22 +16,64 @@ function Node(
   this.job = job;
   this.children = children;
 }
-
-Node.prototype.constructor = Node;
-Node.prototype.gotoChild = function (input) {
-  /**
-   * goes to a child wrt to the input and also performs the job
-   * if no child was found for the input then cleanup and exit
-   */
-  currentNode = this.children[KEYS.indexOf(input)];
-  if (currentNode) {
-    if (currentNode.job) currentNode.job();
-  } else exit();
+Node.prototype = {
+  constructor: Node,
+  gotoChild(input) {
+    /**
+     * goes to a child wrt to the input and also performs the job
+     * if no child was found for the input then cleanup and exit
+     */
+    currentNode = this.children[KEYS.indexOf(input)];
+    if (currentNode) {
+      if (currentNode.job) currentNode.job();
+    } else exit();
+  },
+  getLeaves(customNodesStartIndex = MAIN_NODES.length) {
+    /**
+     * get leaf nodes (except the main nodes because of recurssion) with their paths
+     * returns leaf nodes with their path
+     */
+    const leaves = [];
+    (function traverse(path, node) {
+      if (node.children === undefined) leaves.push({ path, node });
+      else
+        node.children.slice(customNodesStartIndex).forEach((node, index) => {
+          traverse(path + KEYS[customNodesStartIndex + index], node);
+        });
+    })("", this);
+    return leaves;
+  },
 };
-Node.prototype.getLeaves = function () {
-  /**
-   * get leaf nodes (except the main nodes because of recurssion) with their paths
-   */
+function PathOverlay(path, element) {
+  this.overlayElement = (() => {
+    const el = document.createElement("div");
+    el.className = "keynavPathContainerBox";
+    el.style.left = element.offsetLeft;
+    el.style.top = element.offsetTop;
+    el.style.zIndex = this.__proto__.lastZIndex++;
+    el.innerHTML = `<span class="keynavPath">${path.toUpperCase()}</span>`;
+    return el;
+  })();
+  this.addOverlayElement();
+}
+PathOverlay.prototype = {
+  constructor: PathOverlay,
+  container: null,
+  lastZIndex: 10000,
+  on() {
+    this.overlayElement.style.display = "block";
+  },
+
+  off() {
+    this.overlayElement.style.display = "none";
+  },
+
+  addOverlayElement() {
+    this.container.appendChild(this.overlayElement);
+  },
+  removeOverlayElement() {
+    this.container.removeChild(this.overlayElement);
+  },
 };
 
 const SCROLL_DOWN_NODE = new Node(function () {
@@ -55,7 +97,23 @@ const CLICK_NODE = new Node(function () {
   getAllValidElements();
   let elements = getElementsWithInDisplay();
   this.children = generateGraph(elements).children;
-  console.log(this);
+
+  const cssLink = document.createElement("link");
+  cssLink.rel = "stylesheet";
+  cssLink.href = chrome.runtime.getURL("content-scripts/overlayCss.css");
+  document.head.appendChild(cssLink);
+
+  const leaves = this.getLeaves();
+
+  const overlayContainer = document.createElement("div");
+  overlayContainer.id = "keynavOverlayContainer";
+  overlayContainer.style.zIndex = 9999;
+  document.documentElement.appendChild(overlayContainer);
+
+  PathOverlay.prototype.container = overlayContainer;
+  leaves.forEach((leaf) => {
+    new PathOverlay(leaf.path, leaf.node.element);
+  });
 });
 
 const MAIN_NODES = [SCROLL_DOWN_NODE, SCROLL_UP_NODE, HOVER_NODE, CLICK_NODE]; // todo: add horizontal scroll nodes
@@ -86,7 +144,6 @@ function getElementsWithInDisplay() {
    * elements to be captured can be provided by the user
    * linear filtering is applied which need to be changed with recursive later
    */
-  console.log(allValidDomElements);
   return allValidDomElements.filter((el) => isVisible(el));
 }
 function generateGraph(elements, isHover = false) {
@@ -96,13 +153,15 @@ function generateGraph(elements, isHover = false) {
    * return a node
    */
   const navKeys = KEYS.slice(MAIN_NODES.length);
-  const elementNodes = elements.map(
-    (el) =>
-      new Node(function () {
-        exit();
-        el.click();
-      })
-  );
+  const elementNodes = elements.map((el) => {
+    const node = new Node(function () {
+      exit();
+      el.click();
+    });
+    node.element = el;
+    console.log(el);
+    return node;
+  });
   function createParentNodes(nodes, childrenNumber) {
     if (nodes.length <= 1) return nodes;
     const parentNodes = [];
