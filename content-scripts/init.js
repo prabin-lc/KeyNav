@@ -48,8 +48,10 @@ function PathOverlay(path, element) {
   this.overlayElement = (() => {
     const el = document.createElement("div");
     el.className = "keynavPathContainerBox";
-    el.style.left = element.offsetLeft;
-    el.style.top = element.offsetTop;
+    const rect = element.getBoundingClientRect();
+    console.log(path, element, rect);
+    el.style.left = rect.left.toString() + "px";
+    el.style.top = rect.top.toString() + "px";
     el.style.zIndex = this.__proto__.lastZIndex++;
     el.innerHTML = `<span class="keynavPath">${path.toUpperCase()}</span>`;
     return el;
@@ -108,6 +110,7 @@ const CLICK_NODE = new Node(function () {
   const overlayContainer = document.createElement("div");
   overlayContainer.id = "keynavOverlayContainer";
   overlayContainer.style.zIndex = 9999;
+  overlayContainer.style.position = "static";
   document.documentElement.appendChild(overlayContainer);
 
   PathOverlay.prototype.container = overlayContainer;
@@ -159,7 +162,6 @@ function generateGraph(elements, isHover = false) {
       el.click();
     });
     node.element = el;
-    console.log(el);
     return node;
   });
   function createParentNodes(nodes, childrenNumber) {
@@ -204,6 +206,7 @@ function exit(error = null) {
    * cleanup all events, remove event listeners, reset render
    */
   if (error) console.error(error);
+  if (PathOverlay.prototype.container) document.documentElement.removeChild(PathOverlay.prototype.container);
   currentNode = ROOT_NODE;
   appStatus = "idle";
   document.body.removeEventListener("keypress", keyPressListener);
