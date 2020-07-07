@@ -1,6 +1,16 @@
 let appStatus = "idle";
-
 const KEYS = ["j", "k", "a", "f", "h", "g", "c"];
+
+let cssInjected = false;
+function injectCss() {
+  if (!cssInjected) {
+    const cssLink = document.createElement("link");
+    cssLink.rel = "stylesheet";
+    cssLink.href = chrome.runtime.getURL("content-scripts/overlayCss.css");
+    document.head.appendChild(cssLink);
+    cssInjected = true;
+  }
+}
 let allValidDomElements = null;
 function Node(
   /**
@@ -62,12 +72,18 @@ PathOverlay.prototype = {
   constructor: PathOverlay,
   container: null,
   lastZIndex: 10000,
-  on() {
-    this.overlayElement.style.display = "block";
-  },
 
-  off() {
-    this.overlayElement.style.display = "none";
+  startContainer() {
+    if (this !== PathOverlay.prototype) throw "Illegal call to the function";
+
+    if (this.container) {
+      document.documentElement.removeChild(this.container);
+    }
+
+    const overlayContainer = document.createElement("div");
+    overlayContainer.id = "keynavOverlayContainer";
+    document.documentElement.appendChild(overlayContainer);
+    this.container = overlayContainer;
   },
 
   addOverlayElement() {
@@ -91,6 +107,19 @@ const SCROLL_UP_NODE = new Node(function () {
 const HOVER_NODE = new Node(function () {
   // generate child nodes
   // change display to override elements
+  getAllValidElements();
+  let elements = getElementsWithInDisplay();
+  this.children = generateGraph(elements, true).children;
+
+  injectCss();
+
+  const leaves = this.getLeaves();
+
+  PathOverlay.prototype.startContainer();
+
+  leaves.forEach((leaf) => {
+    new PathOverlay(leaf.path, leaf.node.element);
+  });
 });
 
 const CLICK_NODE = new Node(function () {
@@ -100,18 +129,12 @@ const CLICK_NODE = new Node(function () {
   let elements = getElementsWithInDisplay();
   this.children = generateGraph(elements).children;
 
-  const cssLink = document.createElement("link");
-  cssLink.rel = "stylesheet";
-  cssLink.href = chrome.runtime.getURL("content-scripts/overlayCss.css");
-  document.head.appendChild(cssLink);
+  injectCss();
 
   const leaves = this.getLeaves();
 
-  const overlayContainer = document.createElement("div");
-  overlayContainer.id = "keynavOverlayContainer";
-  document.documentElement.appendChild(overlayContainer);
+  PathOverlay.prototype.startContainer();
 
-  PathOverlay.prototype.container = overlayContainer;
   leaves.forEach((leaf) => {
     new PathOverlay(leaf.path, leaf.node.element);
   });
@@ -130,10 +153,10 @@ let currentNode = ROOT_NODE;
 function isVisible(el) {
   const rect = el.getBoundingClientRect();
   return (
-    rect.top >= 0 &&
-    rect.left >= 0 &&
-    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    rect.top > 0 &&
+    rect.left > 0 &&
+    rect.bottom < (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right < (window.innerWidth || document.documentElement.clientWidth)
   );
 }
 function getAllValidElements(validTags = ["button", "a"]) {
@@ -154,14 +177,22 @@ function generateGraph(elements, isHover = false) {
    * return a node
    */
   const navKeys = KEYS.slice(MAIN_NODES.length);
-  const elementNodes = elements.map((el) => {
-    const node = new Node(function () {
-      exit();
-      el.click();
-    });
-    node.element = el;
-    return node;
-  });
+  const elementNodes = isHover
+    ? elements.map((el) => {
+        const node = new Node(function () {
+          exit();
+        });
+        node.element = el;
+        return node;
+      })
+    : elements.map((el) => {
+        const node = new Node(function () {
+          exit();
+          el.click();
+        });
+        node.element = el;
+        return node;
+      });
   function createParentNodes(nodes, childrenNumber) {
     if (nodes.length <= 1) return nodes;
     const parentNodes = [];
@@ -204,7 +235,10 @@ function exit(error = null) {
    * cleanup all events, remove event listeners, reset render
    */
   if (error) console.error(error);
-  if (PathOverlay.prototype.container) document.documentElement.removeChild(PathOverlay.prototype.container);
+  if (PathOverlay.prototype.container) {
+    document.documentElement.removeChild(PathOverlay.prototype.container);
+    PathOverlay.prototype.container = null;
+  }
   currentNode = ROOT_NODE;
   appStatus = "idle";
   document.body.removeEventListener("keypress", keyPressListener);

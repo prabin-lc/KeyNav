@@ -23,10 +23,10 @@ span.keynavPath {
 }
 
 div.keynavPathContainerBox {
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(255, 247, 133)), to(rgb(255, 197, 66)));
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgb(227, 246, 255)), to(rgb(221, 221, 221)));
   border-width: 1px;
   border-style: solid;
-  border-color: rgb(227, 190, 35);
+  border-color: #edebf0;
   border-image: initial;
   position: absolute;
   display: block;
@@ -40,7 +40,7 @@ div.keynavPathContainerBox {
   width: auto;
 }
 
-div.keynavOverlayContainer {
+div#keynavOverlayContainer {
   bottom: auto;
   box-shadow: none;
   color: black;

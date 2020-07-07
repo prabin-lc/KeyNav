@@ -18,6 +18,11 @@ chrome.commands.onCommand.addListener(function (command) {
             file: "./content-scripts/session.js",
           });
           break;
+        case "running":
+          chrome.tabs.executeScript({
+            code: "exit()",
+          });
+          break;
       }
     }
   );
