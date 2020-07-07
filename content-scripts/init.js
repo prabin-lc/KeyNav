@@ -50,8 +50,8 @@ function PathOverlay(path, element) {
     el.className = "keynavPathContainerBox";
     const rect = element.getBoundingClientRect();
     console.log(path, element, rect);
-    el.style.left = rect.left.toString() + "px";
-    el.style.top = rect.top.toString() + "px";
+    el.style.left = (rect.left + window.scrollX).toString() + "px";
+    el.style.top = (rect.top + window.scrollY).toString() + "px";
     el.style.zIndex = this.__proto__.lastZIndex++;
     el.innerHTML = `<span class="keynavPath">${path.toUpperCase()}</span>`;
     return el;
@@ -109,8 +109,6 @@ const CLICK_NODE = new Node(function () {
 
   const overlayContainer = document.createElement("div");
   overlayContainer.id = "keynavOverlayContainer";
-  overlayContainer.style.zIndex = 9999;
-  overlayContainer.style.position = "static";
   document.documentElement.appendChild(overlayContainer);
 
   PathOverlay.prototype.container = overlayContainer;
