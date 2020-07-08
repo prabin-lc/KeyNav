@@ -1,5 +1,5 @@
 let appStatus = "idle";
-const KEYS = ["j", "k", "a", "f", "h", "g", "c"];
+const KEYS = ["j", "k", "f", "h", "g", "c"];
 
 let cssInjected = false;
 function injectCss() {
@@ -11,7 +11,9 @@ function injectCss() {
     cssInjected = true;
   }
 }
+
 let allValidDomElements = null;
+
 function Node(
   /**
    * the job to perform when user hits this node
@@ -33,6 +35,7 @@ Node.prototype = {
      * goes to a child wrt to the input and also performs the job
      * if no child was found for the input then cleanup and exit
      */
+
     currentNode = this.children[KEYS.indexOf(input)];
     if (currentNode) {
       if (currentNode.job) currentNode.job();
@@ -54,12 +57,13 @@ Node.prototype = {
     return leaves;
   },
 };
+
 function PathOverlay(path, element) {
   this.overlayElement = (() => {
     const el = document.createElement("div");
     el.className = "keynavPathContainerBox";
+    console.log(path, element);
     const rect = element.getBoundingClientRect();
-    console.log(path, element, rect);
     el.style.left = (rect.left + window.scrollX).toString() + "px";
     el.style.top = (rect.top + window.scrollY).toString() + "px";
     el.style.zIndex = this.__proto__.lastZIndex++;
@@ -86,6 +90,15 @@ PathOverlay.prototype = {
     this.container = overlayContainer;
   },
 
+  removeContainer() {
+    if (this !== PathOverlay.prototype) throw "Illegal call to the function";
+
+    if (this.container) {
+      document.documentElement.removeChild(this.container);
+      this.container = null;
+    }
+  },
+
   addOverlayElement() {
     this.container.appendChild(this.overlayElement);
   },
@@ -96,43 +109,46 @@ PathOverlay.prototype = {
 
 const SCROLL_DOWN_NODE = new Node(function () {
   // scroll down
+  PathOverlay.prototype.removeContainer();
   window.scrollBy(0, 200);
 });
 
 const SCROLL_UP_NODE = new Node(function () {
   // scroll up
+  PathOverlay.prototype.removeContainer();
   window.scrollBy(0, -200);
 });
 
-const HOVER_NODE = new Node(function () {
-  // generate child nodes
-  // change display to override elements
-  getAllValidElements();
-  let elements = getElementsWithInDisplay();
-  this.children = generateGraph(elements, true).children;
+// const HOVER_NODE = new Node(function () {
+//   // generate child nodes
+//   // change display to override elements
+//   getAllValidElements();
+//   let elements = getElementsWithInDisplay();
+//   this.children = generateGraph(elements, true).children;
 
-  injectCss();
+//   injectCss();
 
-  const leaves = this.getLeaves();
+//   const leaves = this.getLeaves();
 
-  PathOverlay.prototype.startContainer();
+//   PathOverlay.prototype.startContainer();
 
-  leaves.forEach((leaf) => {
-    new PathOverlay(leaf.path, leaf.node.element);
-  });
-});
+//   leaves.forEach((leaf) => {
+//     new PathOverlay(leaf.path, leaf.node.element);
+//   });
+// });
 
 const CLICK_NODE = new Node(function () {
   // generate child nodes
   // change display to override elements
   getAllValidElements();
+  console.log(allValidDomElements);
   let elements = getElementsWithInDisplay();
-  this.children = generateGraph(elements).children;
+  console.log(elements);
+  this.children = [...MAIN_NODES, ...generateGraph(elements)];
 
   injectCss();
 
   const leaves = this.getLeaves();
-
   PathOverlay.prototype.startContainer();
 
   leaves.forEach((leaf) => {
@@ -140,11 +156,10 @@ const CLICK_NODE = new Node(function () {
   });
 });
 
-const MAIN_NODES = [SCROLL_DOWN_NODE, SCROLL_UP_NODE, HOVER_NODE, CLICK_NODE]; // todo: add horizontal scroll nodes
+const MAIN_NODES = [SCROLL_DOWN_NODE, SCROLL_UP_NODE, CLICK_NODE]; // todo: add horizontal scroll nodes
 
 SCROLL_DOWN_NODE.children = MAIN_NODES;
 SCROLL_UP_NODE.children = MAIN_NODES;
-HOVER_NODE.children = MAIN_NODES;
 CLICK_NODE.children = MAIN_NODES;
 
 const ROOT_NODE = new Node(undefined, MAIN_NODES);
@@ -176,25 +191,19 @@ function generateGraph(elements, isHover = false) {
    * jobs must click or hover the element according to the parameter provided
    * return a node
    */
+  console.log(elements);
   const navKeys = KEYS.slice(MAIN_NODES.length);
-  const elementNodes = isHover
-    ? elements.map((el) => {
-        const node = new Node(function () {
-          exit();
-        });
-        node.element = el;
-        return node;
-      })
-    : elements.map((el) => {
-        const node = new Node(function () {
-          exit();
-          el.click();
-        });
-        node.element = el;
-        return node;
-      });
-  function createParentNodes(nodes, childrenNumber) {
-    if (nodes.length <= 1) return nodes;
+  const elementNodes = elements.map((el) => {
+    const node = new Node(function () {
+      exit();
+      this.element.click();
+    });
+    node.element = el;
+    return node;
+  });
+  console.log(elementNodes, navKeys);
+  function generateChildren(nodes, childrenNumber) {
+    if (nodes.length <= childrenNumber) return nodes;
     const parentNodes = [];
     while (nodes.length > 0) {
       let parentNode = new Node(undefined, [...MAIN_NODES]);
@@ -205,9 +214,9 @@ function generateGraph(elements, isHover = false) {
       }
       parentNodes.push(parentNode);
     }
-    return createParentNodes(parentNodes, childrenNumber);
+    return generateChildren(parentNodes, childrenNumber);
   }
-  return createParentNodes(elementNodes, navKeys.length)[0];
+  return generateChildren(elementNodes, navKeys.length);
 }
 
 function keyPressListener(e) {
@@ -224,7 +233,6 @@ function keyPressListener(e) {
 
 function start() {
   console.log("session started");
-  console.log(allValidDomElements);
   document.getElementsByTagName("html")[0].style["scrollBehavior"] = "smooth";
   document.body.addEventListener("keypress", keyPressListener);
   appStatus = "running";
