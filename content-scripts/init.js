@@ -1,6 +1,8 @@
 let appStatus = "idle";
 const KEYS = ["j", "k", "f", "h", "g", "c"];
 
+const defaultScrollBehaviour = document.getElementsByTagName("html")[0].style["scrollBehavior"];
+
 let cssInjected = false;
 function injectCss() {
   if (!cssInjected) {
@@ -11,8 +13,6 @@ function injectCss() {
     cssInjected = true;
   }
 }
-
-let allValidDomElements = null;
 
 function Node(
   /**
@@ -174,17 +174,16 @@ function isVisible(el) {
     rect.right < (window.innerWidth || document.documentElement.clientWidth)
   );
 }
-function getAllValidElements(validTags = ["button", "a"]) {
-  if (!allValidDomElements) allValidDomElements = Array.from(document.querySelectorAll(validTags.join()));
-}
-function getElementsWithInDisplay() {
+
+function getElementsWithInDisplay(tags = ["button", "a"]) {
   /**
    * gets the elements of dom within screen view
    * elements to be captured can be provided by the user
    * linear filtering is applied which need to be changed with recursive later
    */
-  return allValidDomElements.filter((el) => isVisible(el));
+  return Array.from(document.querySelectorAll(tags.join())).filter((el) => isVisible(el));
 }
+
 function generateGraph(elements, isHover = false) {
   /**
    * generate linked graph for the captured html elements
@@ -247,6 +246,8 @@ function exit(error = null) {
     document.documentElement.removeChild(PathOverlay.prototype.container);
     PathOverlay.prototype.container = null;
   }
+
+  document.getElementsByTagName("html")[0].style["scrollBehavior"] = defaultScrollBehaviour;
   currentNode = ROOT_NODE;
   appStatus = "idle";
   document.body.removeEventListener("keypress", keyPressListener);
