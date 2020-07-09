@@ -1,13 +1,9 @@
-// let appState = {}; // extend for multiple tabs
-
 chrome.commands.onCommand.addListener(function (command) {
-  console.log(chrome);
   chrome.tabs.executeScript(
     {
       code: "if(typeof appStatus === 'undefined') {result='undefined'} else {result = appStatus}",
     },
     function (results) {
-      console.log(results);
       switch (results[0]) {
         case "undefined":
           chrome.tabs.executeScript({

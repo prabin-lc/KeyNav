@@ -1,7 +1,17 @@
 let appStatus = "idle";
-const KEYS = ["j", "k", "f", "h", "g", "c"];
+let KEYS = ["j", "k", "f", "h", "g", "c"];
 
-const defaultScrollBehaviour = document.getElementsByTagName("html")[0].style["scrollBehavior"];
+let defaultScrollBehaviour = document.getElementsByTagName("html")[0].style["scrollBehavior"];
+let scrollBehavior = "smooth";
+
+let selectors = ["button"];
+
+chrome.storage.local.get(undefined, function (data) {
+  console.log(data);
+  if (data.keys) KEYS = data.keys;
+  if (data.scrollBehavior) scrollBehaviour = data.scrollBehavior;
+  if (data.selectors) selectors = data.selectors;
+});
 
 let cssInjected = false;
 function injectCss() {
@@ -78,7 +88,7 @@ PathOverlay.prototype = {
   lastZIndex: 10000,
 
   startContainer() {
-    if (this !== PathOverlay.prototype) throw "Illegal call to the function";
+    if (this !== PathOverlay.prototype) throw Error("Illegal call to the function");
 
     if (this.container) {
       document.documentElement.removeChild(this.container);
@@ -91,7 +101,7 @@ PathOverlay.prototype = {
   },
 
   removeContainer() {
-    if (this !== PathOverlay.prototype) throw "Illegal call to the function";
+    if (this !== PathOverlay.prototype) throw Error("Illegal call to the function");
 
     if (this.container) {
       document.documentElement.removeChild(this.container);
@@ -140,8 +150,6 @@ const SCROLL_UP_NODE = new Node(function () {
 const CLICK_NODE = new Node(function () {
   // generate child nodes
   // change display to override elements
-  getAllValidElements();
-  console.log(allValidDomElements);
   let elements = getElementsWithInDisplay();
   console.log(elements);
   this.children = [...MAIN_NODES, ...generateGraph(elements)];
@@ -175,7 +183,7 @@ function isVisible(el) {
   );
 }
 
-function getElementsWithInDisplay(tags = ["button", "a"]) {
+function getElementsWithInDisplay(tags = selectors) {
   /**
    * gets the elements of dom within screen view
    * elements to be captured can be provided by the user
@@ -192,6 +200,7 @@ function generateGraph(elements, isHover = false) {
    */
   console.log(elements);
   const navKeys = KEYS.slice(MAIN_NODES.length);
+  if (navKeys.length < 2) throw Error("Button clicking keys must be 2 or more.");
   const elementNodes = elements.map((el) => {
     const node = new Node(function () {
       exit();
@@ -200,7 +209,6 @@ function generateGraph(elements, isHover = false) {
     node.element = el;
     return node;
   });
-  console.log(elementNodes, navKeys);
   function generateChildren(nodes, childrenNumber) {
     if (nodes.length <= childrenNumber) return nodes;
     const parentNodes = [];
@@ -232,7 +240,7 @@ function keyPressListener(e) {
 
 function start() {
   console.log("session started");
-  document.getElementsByTagName("html")[0].style["scrollBehavior"] = "smooth";
+  document.getElementsByTagName("html")[0].style["scrollBehavior"] = scrollBehavior;
   document.body.addEventListener("keypress", keyPressListener);
   appStatus = "running";
 }

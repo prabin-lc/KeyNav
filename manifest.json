@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Keyboard control for mouse actions in webpages",
   "manifest_version": 2,
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "storage"],
   "background": {
     "scripts": ["background.js"],
     "persistent": false
