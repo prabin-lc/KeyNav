@@ -88,7 +88,6 @@ function displaySettings(settings) {
       selectorStartInput.value = key;
     });
   } catch (error) {
-    console.trace(error);
     alert(error.message);
   }
 }

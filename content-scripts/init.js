@@ -2,7 +2,7 @@ let appStatus = "idle";
 
 let KEYS = ["j", "k", "f", "h", "g", "c"];
 
-let defaultScrollBehaviour = document.getElementsByTagName("html")[0].style["scrollBehavior"];
+let defaultScrollBehaviour = document.documentElement.style["scrollBehavior"];
 let scrollBehavior = "smooth";
 let scrollHeight = 200;
 let scrollWidth = 200;
@@ -10,7 +10,6 @@ let scrollWidth = 200;
 let selectors = ["button", "a"];
 
 chrome.storage.local.get(undefined, function (data) {
-  console.log(data);
   KEYS = [data.scrollUpKey, data.scrollDownKey, data.clickStartKey, ...data.traverseKeys];
 
   if (data.scrollBehavior) scrollBehaviour = data.scrollBehavior;
@@ -78,7 +77,6 @@ function PathOverlay(path, element) {
   this.overlayElement = (() => {
     const el = document.createElement("div");
     el.className = "keynavPathContainerBox";
-    console.log(path, element);
     const rect = element.getBoundingClientRect();
     el.style.left = (rect.left + window.scrollX).toString() + "px";
     el.style.top = (rect.top + window.scrollY).toString() + "px";
@@ -157,7 +155,6 @@ const CLICK_NODE = new Node(function () {
   // generate child nodes
   // change display to override elements
   let elements = getElementsWithInDisplay();
-  console.log(elements);
   this.children = [...MAIN_NODES, ...generateGraph(elements)];
 
   injectCss();
@@ -204,7 +201,6 @@ function generateGraph(elements, isHover = false) {
    * jobs must click or hover the element according to the parameter provided
    * return a node
    */
-  console.log(elements);
   const navKeys = KEYS.slice(MAIN_NODES.length);
   if (navKeys.length < 2) throw Error("Button clicking keys must be 2 or more.");
   const elementNodes = elements.map((el) => {
@@ -236,7 +232,6 @@ function keyPressListener(e) {
   /**handles key press
    * mainly calls gotoChild of current node
    */
-  console.log(e);
   try {
     currentNode.gotoChild(e.key);
   } catch (error) {
@@ -246,7 +241,7 @@ function keyPressListener(e) {
 
 function start() {
   console.log("session started");
-  document.getElementsByTagName("html")[0].style["scrollBehavior"] = scrollBehavior;
+  document.documentElement.style["scrollBehavior"] = scrollBehavior;
   document.body.addEventListener("keypress", keyPressListener);
   appStatus = "running";
 }
@@ -261,7 +256,7 @@ function exit(error = null) {
     PathOverlay.prototype.container = null;
   }
 
-  document.getElementsByTagName("html")[0].style["scrollBehavior"] = defaultScrollBehaviour;
+  document.documentElement.style["scrollBehavior"] = defaultScrollBehaviour;
   currentNode = ROOT_NODE;
   appStatus = "idle";
   document.body.removeEventListener("keypress", keyPressListener);

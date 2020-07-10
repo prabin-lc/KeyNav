@@ -11,8 +11,8 @@
   "commands": {
     "start-session": {
       "suggested_key": {
-        "default": "Ctrl+Y",
-        "mac": "Ctrl+Y"
+        "default": "Ctrl+I",
+        "mac": "Ctrl+I"
       },
       "description": "Start extension session"
     }
