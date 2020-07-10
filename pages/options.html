@@ -17,12 +17,12 @@
     </style>
   </head>
   <body>
-    <h1 class="title">Options</h1>
+    <h1 class="title is-1">Options</h1>
     <div class="container">
       <form>
         <hr />
         <div class="container">
-          <h4 class="subtitle">Scrolling Behaviour</h4>
+          <h4 class="subtitle is-2">Scrolling Behaviour</h4>
           <dl>
             <dt><code>auto</code></dt>
             <dd>The scrolling box scrolls instantly.</dd>
@@ -37,7 +37,7 @@
           <div class="field">
             <div class="control">
               <label class="radio">
-                <input type="radio" id="scrollauto" name="scrollInput" value="auto" />
+                <input type="radio" id="scrollauto" name="scrollBehaviour" value="auto" />
                 auto
               </label>
             </div>
@@ -45,7 +45,7 @@
           <div class="field">
             <div class="control">
               <label class="radio">
-                <input class="radio" type="radio" id="scrollsmooth" name="scrollInput" value="smooth" />
+                <input class="radio" type="radio" id="scrollsmooth" name="scrollBehaviour" value="smooth" />
                 smooth
               </label>
             </div>
@@ -76,13 +76,13 @@
         </div>
         <hr />
         <div class="container">
-          <h4 class="subtitle">Available Keys</h4>
+          <h4 class="subtitle is-2">Available Keys</h4>
           <div class="container">
             <div class="field">
               <label class="label">Scroll up key:</label>
               <input class="smoll input" type="text" id="scrollUpKey" name="scrollUpKey" minlength="1" maxlength="1" />
               <p class="help">
-                Pressing this key, the extension enters into scroll up node and does its job. <mark> Default: j </mark>
+                Pressing this key, the extension enters into scroll up node and does its job. <br /><mark> Default: j </mark>
               </p>
             </div>
             <hr />
@@ -90,7 +90,7 @@
               <label class="label">Scroll down key:</label>
               <input class="smoll input" type="text" id="scrollDownKey" name="scrollDownKey" minlength="1" maxlength="1" />
               <p class="help">
-                Pressing this key, the extension enters into scroll down node and does its job. <mark> Default: k </mark>
+                Pressing this key, the extension enters into scroll down node and does its job. <br /><mark> Default: k </mark>
               </p>
             </div>
             <hr />
@@ -100,48 +100,48 @@
               <p class="help">
                 Pressing this key, the extension enters into click node and does its job. Job includes searching visible tags
                 valid to be clicked and generates another graph to be appended to this node. Also starts to render the overlay of
-                paths to click the generated nodes. <mark> Default: f </mark>
+                paths to click the generated nodes. <br /><mark> Default: f </mark>
               </p>
             </div>
             <hr />
             <div class="field">
               <label class="label">Click graph traversing keys:</label>
-              <input type="text" name="traverseKeys[]" id="traverseKeys" class="input smoll" minlength="1" maxlength="1" />
-              <button class="button is-small" type="button" onclick="duplicateAndInsert(this.previousElementSibling)">Add</button>
-              <button
-                class="button is-small is-danger"
-                type="button"
-                onclick="this.previousElementSibling.previousElementSibling.remove()"
-              >
-                Delete
-              </button>
-              <p class="help">Hint keys. Keys to traverse nodes to select a element to click. <mark> Default: h, g, c </mark></p>
+              <div class="control">
+                <input type="text" name="traverseKeys" id="traverseKey" class="input smoll" minlength="1" maxlength="1" />
+                <button class="button is-small addInput" type="button">Add</button>
+                <button class="button deleteInput is-small is-danger" type="button">
+                  Delete
+                </button>
+              </div>
+              <p class="help">
+                Hint keys. Keys to traverse nodes to select a element to click. <br /><mark> Default: h, g, c </mark>
+              </p>
             </div>
             <hr />
           </div>
         </div>
         <div class="container">
-          <h4 class="subtitle">Tag Selectors</h4>
+          <h4 class="subtitle is-2">Tag Selectors</h4>
           <div class="field">
             <label class="label">List of elements allowed for clicking: </label>
-            <p class="help">Any custom css selector can be used. <mark>Default: button</mark> and <mark>a</mark>.</p>
+            <p class="help">Any custom css selector can be used. <br /><mark>Default: button</mark> and <mark>a</mark>.</p>
             <br />
-            <input type="text" name="selectors[]" id="selectors" class="input smoll" />
-            <button class="button is-small" type="button" onclick="duplicateAndInsert(this.previousElementSibling)">Add</button>
-            <button
-              class="button is-small is-danger"
-              type="button"
-              onclick="this.previousElementSibling.previousElementSibling.remove()"
-            >
-              Delete
-            </button>
+            <div class="control">
+              <input type="text" name="selectors" id="selector" class="input smoll" />
+              <button class="button is-small addInput" type="button">
+                Add
+              </button>
+              <button class="button deleteInput is-small is-danger" type="button">
+                Delete
+              </button>
+            </div>
           </div>
         </div>
         <hr />
         <br />
         <div class="buttons">
           <button class="button is-light is-outlined is-info" type="submit">Save</button>
-          <button class="button is-light is-outlined is-danger" type="button">Restore to Defaults</button>
+          <button class="button is-light is-outlined is-danger" id="restore" type="button">Restore to Defaults</button>
         </div>
       </form>
     </div>
