@@ -2,4 +2,6 @@
 test.js
 index.html
 .github
+node_modules
 bulma.min.css
+package-lock.json

@@ -36,9 +36,13 @@ document.querySelector("div>form").addEventListener("submit", function (e) {
 document.querySelector("button#restore").addEventListener("click", function () {
   chrome.storage.local.set(defaultSettings, function (error) {
     if (error) alert(error.message);
-    else alert("Restored to defaults.");
+    else {
+      alert("Restored to defaults.");
+      window.location.reload();
+    }
   });
 });
+
 function duplicateAndInsert(tag) {
   const dup = tag.cloneNode();
   tag.insertAdjacentElement("afterend", dup);
@@ -102,7 +106,6 @@ chrome.storage.local.get(null, function (data) {
     customSettings.scrollHeight = parseInt(customSettings.scrollHeight);
     customSettings.scrollWidth = parseInt(customSettings.scrollWidth);
   }
-  console.log(data, customSettings);
   displaySettings(customSettings);
 });
 
