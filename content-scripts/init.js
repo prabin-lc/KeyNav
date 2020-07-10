@@ -1,16 +1,22 @@
 let appStatus = "idle";
+
 let KEYS = ["j", "k", "f", "h", "g", "c"];
 
 let defaultScrollBehaviour = document.getElementsByTagName("html")[0].style["scrollBehavior"];
 let scrollBehavior = "smooth";
+let scrollHeight = 200;
+let scrollWidth = 200;
 
-let selectors = ["button"];
+let selectors = ["button", "a"];
 
 chrome.storage.local.get(undefined, function (data) {
   console.log(data);
-  if (data.keys) KEYS = data.keys;
+  KEYS = [data.scrollUpKey, data.scrollDownKey, data.clickStartKey, ...data.traverseKeys];
+
   if (data.scrollBehavior) scrollBehaviour = data.scrollBehavior;
   if (data.selectors) selectors = data.selectors;
+  if (data.scrollHeight) scrollHeight = data.scrollHeight;
+  if (data.scrollWidth) scrollWidth = data.scrollWidth;
 });
 
 let cssInjected = false;
@@ -120,13 +126,13 @@ PathOverlay.prototype = {
 const SCROLL_DOWN_NODE = new Node(function () {
   // scroll down
   PathOverlay.prototype.removeContainer();
-  window.scrollBy(0, 200);
+  window.scrollBy(0, scrollHeight);
 });
 
 const SCROLL_UP_NODE = new Node(function () {
   // scroll up
   PathOverlay.prototype.removeContainer();
-  window.scrollBy(0, -200);
+  window.scrollBy(0, -scrollHeight);
 });
 
 // const HOVER_NODE = new Node(function () {
