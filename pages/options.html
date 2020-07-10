@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Options</title>
+    <script defer src="options.js"></script>
+    <link rel="stylesheet" href="bulma.min.css" />
+    <style>
+      body {
+        margin: 20px;
+        padding: 20px;
+      }
+      .smoll {
+        max-width: 20vw;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Options</h1>
+    <div class="container">
+      <form>
+        <hr />
+        <div class="container">
+          <h4 class="subtitle">Scrolling Behaviour</h4>
+          <dl>
+            <dt><code>auto</code></dt>
+            <dd>The scrolling box scrolls instantly.</dd>
+            <br />
+            <dt><code>smooth</code></dt>
+            <dd>
+              The scrolling box scrolls in a smooth fashion using a user-agent-defined timing function over a user-agent-defined
+              period of time. User agents should follow platform conventions, if any.
+            </dd>
+          </dl>
+          <br />
+          <div class="field">
+            <div class="control">
+              <label class="radio">
+                <input type="radio" id="scrollauto" name="scrollInput" value="auto" />
+                auto
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <label class="radio">
+                <input class="radio" type="radio" id="scrollsmooth" name="scrollInput" value="smooth" />
+                smooth
+              </label>
+            </div>
+          </div>
+
+          <p class="help"><mark>Default: smooth</mark></p>
+          <br />
+          <label for="" class="label">Height to scroll up and down.</label>
+          <div class="field has-addons">
+            <div class="control">
+              <input type="number" class="input" id="scrollHeight" name="scrollHeight" />
+            </div>
+            <div class="control">
+              <a class="button is-static">px</a>
+            </div>
+          </div>
+          <p class="help"><mark>Default: 200</mark></p>
+          <label for="" class="label">Width to scroll left and right.</label>
+          <div class="field has-addons">
+            <div class="control">
+              <input type="number" class="input" id="scrollWidth" name="scrollWidth" />
+            </div>
+            <div class="control">
+              <a class="button is-static">px</a>
+            </div>
+          </div>
+          <p class="help"><mark>Default: 200</mark></p>
+        </div>
+        <hr />
+        <div class="container">
+          <h4 class="subtitle">Available Keys</h4>
+          <div class="container">
+            <div class="field">
+              <label class="label">Scroll up key:</label>
+              <input class="smoll input" type="text" id="scrollUpKey" name="scrollUpKey" minlength="1" maxlength="1" />
+              <p class="help">
+                Pressing this key, the extension enters into scroll up node and does its job. <mark> Default: j </mark>
+              </p>
+            </div>
+            <hr />
+            <div class="field">
+              <label class="label">Scroll down key:</label>
+              <input class="smoll input" type="text" id="scrollDownKey" name="scrollDownKey" minlength="1" maxlength="1" />
+              <p class="help">
+                Pressing this key, the extension enters into scroll down node and does its job. <mark> Default: k </mark>
+              </p>
+            </div>
+            <hr />
+            <div class="field">
+              <label class="label">Click node entry key:</label>
+              <input class="smoll input" type="text" id="clickStartKey" name="clickStartKey" minlength="1" maxlength="1" />
+              <p class="help">
+                Pressing this key, the extension enters into click node and does its job. Job includes searching visible tags
+                valid to be clicked and generates another graph to be appended to this node. Also starts to render the overlay of
+                paths to click the generated nodes. <mark> Default: f </mark>
+              </p>
+            </div>
+            <hr />
+            <div class="field">
+              <label class="label">Click graph traversing keys:</label>
+              <input type="text" name="traverseKeys[]" id="traverseKeys" class="input smoll" minlength="1" maxlength="1" />
+              <button class="button is-small" type="button" onclick="duplicateAndInsert(this.previousElementSibling)">Add</button>
+              <button
+                class="button is-small is-danger"
+                type="button"
+                onclick="this.previousElementSibling.previousElementSibling.remove()"
+              >
+                Delete
+              </button>
+              <p class="help">Hint keys. Keys to traverse nodes to select a element to click. <mark> Default: h, g, c </mark></p>
+            </div>
+            <hr />
+          </div>
+        </div>
+        <div class="container">
+          <h4 class="subtitle">Tag Selectors</h4>
+          <div class="field">
+            <label class="label">List of elements allowed for clicking: </label>
+            <p class="help">Any custom css selector can be used. <mark>Default: button</mark> and <mark>a</mark>.</p>
+            <br />
+            <input type="text" name="selectors[]" id="selectors" class="input smoll" />
+            <button class="button is-small" type="button" onclick="duplicateAndInsert(this.previousElementSibling)">Add</button>
+            <button
+              class="button is-small is-danger"
+              type="button"
+              onclick="this.previousElementSibling.previousElementSibling.remove()"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+        <hr />
+        <br />
+        <div class="buttons">
+          <button class="button is-light is-outlined is-info" type="submit">Save</button>
+          <button class="button is-light is-outlined is-danger" type="button">Restore to Defaults</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
