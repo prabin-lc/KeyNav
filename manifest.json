@@ -1,7 +1,7 @@
 {
   "name": "Keyboard Navigation",
   "version": "1.0.0",
-  "description": "Keyboard control for mouse actions in webpages",
+  "description": "Minimal extension to click on html elements( links, buttons ) and scroll using keyboard",
   "manifest_version": 2,
   "permissions": ["activeTab", "storage"],
   "background": {
@@ -18,5 +18,13 @@
     }
   },
   "options_page": "pages/options.html",
-  "web_accessible_resources": ["/content-scripts/overlayCss.css"]
+  "web_accessible_resources": ["/content-scripts/overlayCss.css"],
+  "icons": {
+    "16": "images/16.png",
+    "32": "images/32.png",
+    "48": "images/48.png",
+    "128": "images/128.png",
+    "196": "images/196.png",
+    "512": "images/512.png"
+  }
 }
