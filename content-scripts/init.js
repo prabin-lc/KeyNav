@@ -262,5 +262,3 @@ function exit(error = null) {
   document.body.removeEventListener("keypress", keyPressListener);
   console.log("session ended");
 }
-
-// export default generateGraph;

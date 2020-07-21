@@ -5,7 +5,7 @@
   "main": "background.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-css": ".\\node_modules\\.bin\\purifycss ./node_modules/bulma/css/bulma.css .\\pages\\options.html .\\pages\\options.js -i -m -o .\\pages\\style.min.css"
+    "build-options-css": ".\\node_modules\\.bin\\purifycss ./node_modules/bulma/css/bulma.css .\\pages\\options.html .\\pages\\options.js -i -m -o .\\pages\\style.min.css"
   },
   "author": "Prabin Lamichhane",
   "license": "MIT",
