@@ -16,7 +16,6 @@ Also can scroll vertically.
 To install manually, clone the repo and load unpacked extension from
 `chrome://extensions` and point to the repo folder.
 
-
 ## Usage
 
 `CTRL-I` to start/stop extension. ( This key cannot be changed from extension
@@ -38,7 +37,7 @@ Default settings:
 
 ## How it works?
 
-**AlgorithAm** :
+**Algori-thAm** :
 
 Graph data structure is used for the working of this extension. Any node in the working
 graph can have a job and children. Pressing a key while in a node traverses to

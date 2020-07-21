@@ -1,5 +1,5 @@
 {
-  "name": "Keyboard Navigation",
+  "name": "KeyNav",
   "version": "1.0.0",
   "description": "Minimal extension to click on html elements( links, buttons ) and scroll using keyboard",
   "manifest_version": 2,
