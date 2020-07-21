@@ -38,7 +38,7 @@ Default settings:
 
 ## How it works?
 
-**AlgorithAm** 
+**AlgorithAm** :
 
 Graph data structure is used for the working of this extension. Any node in the working
 graph can have a job and children. Pressing a key while in a node traverses to
